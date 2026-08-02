@@ -35,14 +35,16 @@ export default function ContactForm() {
     setIsSubmitting(true);
 
     try {
+      const insertPayload = {
+        name: data.name,
+        email: data.email,
+        company: data.company || null,
+        message: data.message,
+      };
       const { error } = await getSupabase()
         .from("leads")
-        .insert({
-          name: data.name,
-          email: data.email,
-          company: data.company || null,
-          message: data.message,
-        } as never);
+        // @ts-expect-error Supabase types don't match our schema
+        .insert(insertPayload);
 
       if (error) {
         if (error.code === "23505") {

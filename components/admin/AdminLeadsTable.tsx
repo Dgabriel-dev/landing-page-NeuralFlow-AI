@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { createClient } from "@supabase/supabase-js";
+import { getSupabase } from "@/lib/supabase";
+import type { Lead } from "@/types";
 import {
   Search,
   Trash2,
@@ -14,16 +15,6 @@ import {
   Calendar,
   MessageSquare,
 } from "lucide-react";
-
-interface Lead {
-  id: string;
-  name: string;
-  email: string;
-  company: string | null;
-  message: string;
-  created_at: string;
-  status: string;
-}
 
 const statusLabels: Record<string, { label: string; color: string }> = {
   new: { label: "Novo", color: "bg-blue-500/10 text-blue-400 border-blue-500/20" },
@@ -73,11 +64,7 @@ export default function AdminLeadsTable({
 
     setDeletingId(id);
     try {
-      const supabase = createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-      );
-      const { error } = await supabase.from("leads").delete().eq("id", id);
+      const { error } = await getSupabase().from("leads").delete().eq("id", id);
       if (error) {
         alert("Erro ao excluir lead.");
         return;
@@ -102,9 +89,7 @@ export default function AdminLeadsTable({
 
   return (
     <div className="relative rounded-2xl border border-white/10 bg-white/[0.02] backdrop-blur-sm">
-      {/* Toolbar */}
       <div className="flex flex-col gap-4 border-b border-white/10 p-4 sm:flex-row sm:items-center sm:justify-between">
-        {/* Search */}
         <div className="relative flex-1 sm:max-w-sm">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500" />
           <input
@@ -112,16 +97,17 @@ export default function AdminLeadsTable({
             placeholder="Buscar por nome, email ou empresa..."
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
+            aria-label="Buscar leads"
             className="w-full rounded-xl border border-white/10 bg-white/5 py-2.5 pl-10 pr-4 text-sm text-white placeholder-gray-500 outline-none transition-all focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/50"
           />
         </div>
 
-        {/* Status filter */}
         <div className="flex items-center gap-2">
           <Filter className="h-4 w-4 text-gray-500" />
           <select
             value={status}
             onChange={(e) => onStatusChange(e.target.value)}
+            aria-label="Filtrar por status"
             className="rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white outline-none transition-all focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/50"
           >
             <option value="">Todos os status</option>
@@ -132,13 +118,11 @@ export default function AdminLeadsTable({
           </select>
         </div>
 
-        {/* Count */}
         <div className="text-sm text-gray-500">
           {totalCount} lead{totalCount !== 1 ? "s" : ""}
         </div>
       </div>
 
-      {/* Table */}
       <div className="overflow-x-auto">
         {leads.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-gray-500">
@@ -149,19 +133,16 @@ export default function AdminLeadsTable({
           <table className="w-full text-left text-sm">
             <thead>
               <tr className="border-b border-white/10 text-xs text-gray-500 uppercase tracking-wider">
-                <th className="px-4 py-3 font-medium">Nome</th>
-                <th className="hidden px-4 py-3 font-medium md:table-cell">Empresa</th>
-                <th className="hidden px-4 py-3 font-medium lg:table-cell">Data</th>
-                <th className="px-4 py-3 font-medium">Status</th>
-                <th className="px-4 py-3 font-medium text-right">Ações</th>
+                <th scope="col" className="px-4 py-3 font-medium">Nome</th>
+                <th scope="col" className="hidden px-4 py-3 font-medium md:table-cell">Empresa</th>
+                <th scope="col" className="hidden px-4 py-3 font-medium lg:table-cell">Data</th>
+                <th scope="col" className="px-4 py-3 font-medium">Status</th>
+                <th scope="col" className="px-4 py-3 font-medium text-right">Ações</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
               {leads.map((lead) => (
-                <tr
-                  key={lead.id}
-                  className="transition-colors hover:bg-white/[0.02]"
-                >
+                <tr key={lead.id} className="transition-colors hover:bg-white/[0.02]">
                   <td className="px-4 py-3">
                     <div>
                       <div className="font-medium text-white">{lead.name}</div>
@@ -179,7 +160,7 @@ export default function AdminLeadsTable({
                           {lead.company}
                         </>
                       ) : (
-                        <span className="text-gray-600">—</span>
+                        <span className="text-gray-600">&mdash;</span>
                       )}
                     </div>
                   </td>
@@ -190,22 +171,16 @@ export default function AdminLeadsTable({
                     </div>
                   </td>
                   <td className="px-4 py-3">
-                    <span
-                      className={`inline-flex rounded-full border px-2.5 py-0.5 text-xs font-medium ${
-                        statusLabels[lead.status]?.color || ""
-                      }`}
-                    >
+                    <span className={`inline-flex rounded-full border px-2.5 py-0.5 text-xs font-medium ${statusLabels[lead.status]?.color || ""}`}>
                       {statusLabels[lead.status]?.label || lead.status}
                     </span>
                   </td>
                   <td className="px-4 py-3 text-right">
                     <div className="flex items-center justify-end gap-1">
                       <button
-                        onClick={() =>
-                          setExpandedId(expandedId === lead.id ? null : lead.id)
-                        }
+                        onClick={() => setExpandedId(expandedId === lead.id ? null : lead.id)}
                         className="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-white/10 hover:text-white"
-                        aria-label="Ver mensagem"
+                        aria-label={expandedId === lead.id ? "Ocultar mensagem" : "Ver mensagem"}
                       >
                         <MessageSquare className="h-4 w-4" />
                       </button>
@@ -229,7 +204,6 @@ export default function AdminLeadsTable({
           </table>
         )}
 
-        {/* Expanded message */}
         {expandedId && (
           <div className="border-t border-white/10 bg-white/[0.02] px-4 py-4">
             <div className="text-xs text-gray-500">Mensagem:</div>
@@ -240,9 +214,8 @@ export default function AdminLeadsTable({
         )}
       </div>
 
-      {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-between border-t border-white/10 px-4 py-3">
+        <nav className="flex items-center justify-between border-t border-white/10 px-4 py-3" aria-label="Paginação">
           <div className="text-xs text-gray-500">
             Página {currentPage} de {totalPages}
           </div>
@@ -270,6 +243,7 @@ export default function AdminLeadsTable({
                 <button
                   key={pageNum}
                   onClick={() => onPageChange(pageNum)}
+                  aria-current={currentPage === pageNum ? "page" : undefined}
                   className={`flex h-8 w-8 items-center justify-center rounded-lg text-sm transition-colors ${
                     currentPage === pageNum
                       ? "bg-blue-500/10 text-blue-400"
@@ -289,7 +263,7 @@ export default function AdminLeadsTable({
               <ChevronRight className="h-4 w-4" />
             </button>
           </div>
-        </div>
+        </nav>
       )}
     </div>
   );

@@ -1,5 +1,15 @@
 import { ReactNode } from "react";
 
+export interface Lead {
+  id: string;
+  name: string;
+  email: string;
+  company: string | null;
+  message: string;
+  created_at: string;
+  status: string;
+}
+
 export interface NavItem {
   label: string;
   href: string;

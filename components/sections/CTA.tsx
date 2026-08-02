@@ -47,7 +47,7 @@ export default function CTA() {
 
               <FadeIn delay={0.4}>
                 <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
-                  <Button size="lg" className="group min-w-[220px]">
+                  <Button href="#contact" size="lg" className="group min-w-[220px]">
                     Comece Gratuitamente
                     <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
                   </Button>

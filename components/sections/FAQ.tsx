@@ -13,17 +13,24 @@ function FAQItem({
   answer,
   isOpen,
   onToggle,
+  index,
 }: {
   question: string;
   answer: string;
   isOpen: boolean;
   onToggle: () => void;
+  index: number;
 }) {
+  const panelId = `faq-panel-${index}`;
+  const buttonId = `faq-button-${index}`;
+
   return (
     <div className="border-b border-white/10 last:border-b-0">
       <button
+        id={buttonId}
         onClick={onToggle}
         aria-expanded={isOpen}
+        aria-controls={panelId}
         className="flex w-full items-center justify-between gap-4 py-5 text-left transition-colors hover:text-blue-400"
       >
         <span className="text-base font-medium text-white">{question}</span>
@@ -39,6 +46,9 @@ function FAQItem({
       <AnimatePresence initial={false}>
         {isOpen && (
           <motion.div
+            id={panelId}
+            role="region"
+            aria-labelledby={buttonId}
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
@@ -97,6 +107,7 @@ export default function FAQ() {
                 answer={item.answer}
                 isOpen={openIndex === i}
                 onToggle={() => setOpenIndex(openIndex === i ? null : i)}
+                index={i}
               />
             ))}
           </div>

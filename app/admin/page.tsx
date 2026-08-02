@@ -1,21 +1,12 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { createClient } from "@supabase/supabase-js";
+import { getSupabase } from "@/lib/supabase";
 import AdminLeadsTable from "@/components/admin/AdminLeadsTable";
 import { Loader2 } from "lucide-react";
+import type { Lead } from "@/types";
 
 const PAGE_SIZE = 10;
-
-interface Lead {
-  id: string;
-  name: string;
-  email: string;
-  company: string | null;
-  message: string;
-  created_at: string;
-  status: string;
-}
 
 export default function AdminPage() {
   const [leads, setLeads] = useState<Lead[]>([]);
@@ -24,6 +15,7 @@ export default function AdminPage() {
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
   const [totalCount, setTotalCount] = useState(0);
+  const [refreshKey, setRefreshKey] = useState(0);
   const [stats, setStats] = useState({
     total: 0,
     new: 0,
@@ -46,11 +38,7 @@ export default function AdminPage() {
 
     async function fetchLeads() {
       setLoading(true);
-      const supabase = createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-      );
-
+      const supabase = getSupabase();
       const currentPage = pageRef.current;
       const currentSearch = searchRef.current;
       const currentStatus = statusRef.current;
@@ -83,21 +71,14 @@ export default function AdminPage() {
     }
 
     fetchLeads();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [page, search, status]);
+    return () => { cancelled = true; };
+  }, [page, search, status, refreshKey]);
 
   useEffect(() => {
     let cancelled = false;
 
     async function fetchStats() {
-      const supabase = createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-      );
-
+      const supabase = getSupabase();
       const [total, newCount, contacted, converted] = await Promise.all([
         supabase.from("leads").select("*", { count: "exact", head: true }),
         supabase.from("leads").select("*", { count: "exact", head: true }).eq("status", "new"),
@@ -116,22 +97,17 @@ export default function AdminPage() {
     }
 
     fetchStats();
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+    return () => { cancelled = true; };
+  }, [refreshKey]);
 
   function handleRefresh() {
-    // Force re-fetch by toggling a refresh counter
-    setPage((p) => p);
+    setRefreshKey((k) => k + 1);
   }
 
   const totalPages = Math.ceil(totalCount / PAGE_SIZE);
 
   return (
     <div className="mx-auto max-w-7xl">
-      {/* Header */}
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-white">Dashboard</h1>
         <p className="mt-1 text-sm text-gray-400">
@@ -139,7 +115,6 @@ export default function AdminPage() {
         </p>
       </div>
 
-      {/* Stats */}
       <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {[
           { label: "Total de Leads", value: stats.total, color: "text-white" },
@@ -159,7 +134,6 @@ export default function AdminPage() {
         ))}
       </div>
 
-      {/* Leads table */}
       {loading && leads.length === 0 ? (
         <div className="flex items-center justify-center py-16">
           <Loader2 className="h-8 w-8 animate-spin text-blue-400" />

@@ -17,6 +17,8 @@ export const SITE_CONFIG = {
   ogImage: "/og-image.png",
   email: "contato@neuralflow.ai",
   phone: "+55 (11) 9999-0000",
+  twitter: "@neuralflowai",
+  github: "https://github.com/Dgabriel-dev",
   keywords: [
     "inteligência artificial",
     "machine learning",

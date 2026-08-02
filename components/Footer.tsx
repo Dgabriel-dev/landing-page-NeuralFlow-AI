@@ -102,7 +102,7 @@ export default function Footer() {
                 Updates sobre IA, product tips e lançamentos.
               </p>
             </div>
-            <form className="flex w-full gap-2 sm:w-auto" onSubmit={(e) => e.preventDefault()}>
+            <form className="flex w-full gap-2 sm:w-auto" aria-label="Inscrever-se na newsletter" onSubmit={(e) => e.preventDefault()}>
               <input
                 type="email"
                 placeholder="seu@email.com"
