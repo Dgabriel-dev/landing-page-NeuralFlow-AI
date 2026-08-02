@@ -5,12 +5,6 @@ import { useRouter } from "next/navigation";
 import AdminSidebar from "@/components/admin/AdminSidebar";
 import { Loader2 } from "lucide-react";
 
-function isSupabaseConfigured() {
-  return !!(
-    process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-  );
-}
-
 export default function AdminLayout({
   children,
 }: {
@@ -22,28 +16,56 @@ export default function AdminLayout({
   const router = useRouter();
 
   useEffect(() => {
-    if (!isSupabaseConfigured()) {
-      setError(
-        "Variáveis de ambiente do Supabase não configuradas. Defina NEXT_PUBLIC_SUPABASE_URL e NEXT_PUBLIC_SUPABASE_ANON_KEY."
-      );
-      setLoading(false);
-      return;
-    }
+    let cancelled = false;
 
-    import("@/lib/supabase")
-      .then(({ getSupabase }) => getSupabase().auth.getUser())
-      .then(({ data: { user } }) => {
-        if (!user) {
-          router.push("/admin/login");
+    const timeout = setTimeout(() => {
+      if (!cancelled) {
+        setError("Tempo esgotado ao conectar com Supabase. Verifique as variáveis de ambiente no Vercel.");
+        setLoading(false);
+      }
+    }, 10000);
+
+    async function checkAuth() {
+      try {
+        if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+          if (!cancelled) {
+            setError("Variáveis de ambiente do Supabase não configuradas.");
+            setLoading(false);
+          }
           return;
         }
-        setUser(user);
+
+        const { getSupabase } = await import("@/lib/supabase");
+        const supabase = getSupabase();
+        const { data, error: sessionError } = await supabase.auth.getSession();
+
+        if (cancelled) return;
+
+        if (sessionError) {
+          router.replace("/admin/login");
+          return;
+        }
+
+        if (!data.session) {
+          router.replace("/admin/login");
+          return;
+        }
+
+        setUser(data.session.user);
         setLoading(false);
-      })
-      .catch(() => {
-        setError("Erro ao conectar com Supabase. Verifique as variáveis de ambiente.");
-        setLoading(false);
-      });
+      } catch {
+        if (!cancelled) {
+          router.replace("/admin/login");
+        }
+      }
+    }
+
+    checkAuth();
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timeout);
+    };
   }, [router]);
 
   if (loading) {
