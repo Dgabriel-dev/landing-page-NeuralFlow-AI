@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { getSupabase } from "@/lib/supabase";
 import AdminLeadsTable from "@/components/admin/AdminLeadsTable";
 import { Loader2 } from "lucide-react";
 import type { Lead } from "@/types";
@@ -38,35 +37,44 @@ export default function AdminPage() {
 
     async function fetchLeads() {
       setLoading(true);
-      const supabase = getSupabase();
-      const currentPage = pageRef.current;
-      const currentSearch = searchRef.current;
-      const currentStatus = statusRef.current;
-      const from = (currentPage - 1) * PAGE_SIZE;
-      const to = from + PAGE_SIZE - 1;
+      try {
+        const { getSupabase } = await import("@/lib/supabase");
+        const supabase = getSupabase();
+        const currentPage = pageRef.current;
+        const currentSearch = searchRef.current;
+        const currentStatus = statusRef.current;
+        const from = (currentPage - 1) * PAGE_SIZE;
+        const to = from + PAGE_SIZE - 1;
 
-      let query = supabase
-        .from("leads")
-        .select("*", { count: "exact" })
-        .order("created_at", { ascending: false })
-        .range(from, to);
+        let query = supabase
+          .from("leads")
+          .select("*", { count: "exact" })
+          .order("created_at", { ascending: false })
+          .range(from, to);
 
-      if (currentSearch) {
-        query = query.or(
-          `name.ilike.%${currentSearch}%,email.ilike.%${currentSearch}%,company.ilike.%${currentSearch}%`
-        );
-      }
+        if (currentSearch) {
+          query = query.or(
+            `name.ilike.%${currentSearch}%,email.ilike.%${currentSearch}%,company.ilike.%${currentSearch}%`
+          );
+        }
 
-      if (currentStatus) {
-        query = query.eq("status", currentStatus);
-      }
+        if (currentStatus) {
+          query = query.eq("status", currentStatus);
+        }
 
-      const { data, count } = await query;
+        const { data, count } = await query;
 
-      if (!cancelled) {
-        setLeads(data || []);
-        setTotalCount(count || 0);
-        setLoading(false);
+        if (!cancelled) {
+          setLeads(data || []);
+          setTotalCount(count || 0);
+        }
+      } catch {
+        if (!cancelled) {
+          setLeads([]);
+          setTotalCount(0);
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
       }
     }
 
@@ -78,21 +86,26 @@ export default function AdminPage() {
     let cancelled = false;
 
     async function fetchStats() {
-      const supabase = getSupabase();
-      const [total, newCount, contacted, converted] = await Promise.all([
-        supabase.from("leads").select("*", { count: "exact", head: true }),
-        supabase.from("leads").select("*", { count: "exact", head: true }).eq("status", "new"),
-        supabase.from("leads").select("*", { count: "exact", head: true }).eq("status", "contacted"),
-        supabase.from("leads").select("*", { count: "exact", head: true }).eq("status", "converted"),
-      ]);
+      try {
+        const { getSupabase } = await import("@/lib/supabase");
+        const supabase = getSupabase();
+        const [total, newCount, contacted, converted] = await Promise.all([
+          supabase.from("leads").select("*", { count: "exact", head: true }),
+          supabase.from("leads").select("*", { count: "exact", head: true }).eq("status", "new"),
+          supabase.from("leads").select("*", { count: "exact", head: true }).eq("status", "contacted"),
+          supabase.from("leads").select("*", { count: "exact", head: true }).eq("status", "converted"),
+        ]);
 
-      if (!cancelled) {
-        setStats({
-          total: total.count || 0,
-          new: newCount.count || 0,
-          contacted: contacted.count || 0,
-          converted: converted.count || 0,
-        });
+        if (!cancelled) {
+          setStats({
+            total: total.count || 0,
+            new: newCount.count || 0,
+            contacted: contacted.count || 0,
+            converted: converted.count || 0,
+          });
+        }
+      } catch {
+        // ignore stats errors
       }
     }
 

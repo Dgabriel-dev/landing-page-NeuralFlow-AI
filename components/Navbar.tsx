@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import { NAV_ITEMS, SITE_CONFIG } from "@/lib/constants";
-import ThemeToggle from "@/ui/ThemeToggle";
 import { Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -55,12 +54,10 @@ export default function Navbar() {
               {item.label}
             </Link>
           ))}
-          <ThemeToggle />
         </div>
 
         {/* Mobile */}
         <div className="flex items-center gap-3 md:hidden">
-          <ThemeToggle />
           <button
             ref={buttonRef}
             onClick={() => setMobileOpen(!mobileOpen)}
