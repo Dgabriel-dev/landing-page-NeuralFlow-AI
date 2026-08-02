@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import AdminSidebar from "@/components/admin/AdminSidebar";
 import { Loader2 } from "lucide-react";
 
@@ -14,13 +14,21 @@ export default function AdminLayout({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const router = useRouter();
+  const pathname = usePathname();
+
+  const isLoginPage = pathname === "/admin/login";
 
   useEffect(() => {
+    if (isLoginPage) {
+      setLoading(false);
+      return;
+    }
+
     let cancelled = false;
 
     const timeout = setTimeout(() => {
       if (!cancelled) {
-        setError("Tempo esgotado ao conectar com Supabase. Verifique as variáveis de ambiente no Vercel.");
+        setError("Tempo esgotado ao conectar com Supabase.");
         setLoading(false);
       }
     }, 10000);
@@ -41,12 +49,7 @@ export default function AdminLayout({
 
         if (cancelled) return;
 
-        if (sessionError) {
-          router.replace("/admin/login");
-          return;
-        }
-
-        if (!data.session) {
+        if (sessionError || !data.session) {
           router.replace("/admin/login");
           return;
         }
@@ -66,7 +69,7 @@ export default function AdminLayout({
       cancelled = true;
       clearTimeout(timeout);
     };
-  }, [router]);
+  }, [router, isLoginPage]);
 
   if (loading) {
     return (
@@ -74,6 +77,10 @@ export default function AdminLayout({
         <Loader2 className="h-8 w-8 animate-spin text-blue-400" />
       </div>
     );
+  }
+
+  if (isLoginPage) {
+    return <>{children}</>;
   }
 
   if (error) {
