@@ -14,8 +14,32 @@ export interface Feature {
 export interface Testimonial {
   name: string;
   role: string;
+  company: string;
   content: string;
-  avatar?: string;
+  rating: number;
+}
+
+export interface Benefit {
+  icon: string;
+  title: string;
+  description: string;
+  stat?: string;
+  statLabel?: string;
+}
+
+export interface FAQItem {
+  question: string;
+  answer: string;
+}
+
+export interface Partner {
+  name: string;
+  logo?: string;
+}
+
+export interface FooterLinkGroup {
+  title: string;
+  links: NavItem[];
 }
 
 export interface SectionProps {

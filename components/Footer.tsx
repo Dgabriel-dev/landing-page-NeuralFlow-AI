@@ -1,5 +1,8 @@
+"use client";
+
 import Link from "next/link";
-import { NAV_ITEMS, SITE_CONFIG } from "@/lib/constants";
+import { SITE_CONFIG, FOOTER_LINKS } from "@/lib/constants";
+import FadeIn from "@/ui/FadeIn";
 
 function GithubIcon({ className }: { className?: string }) {
   return (
@@ -25,75 +28,123 @@ function TwitterIcon({ className }: { className?: string }) {
   );
 }
 
+const socialLinks = [
+  { icon: GithubIcon, href: "https://github.com/Dgabriel-dev", label: "GitHub" },
+  { icon: LinkedinIcon, href: "#", label: "LinkedIn" },
+  { icon: TwitterIcon, href: "#", label: "Twitter" },
+];
+
 export default function Footer() {
   return (
     <footer className="border-t border-white/10 bg-gray-950">
-      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-        <div className="grid gap-8 md:grid-cols-3">
-          <div>
+      <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+        {/* Main grid */}
+        <div className="grid gap-10 lg:grid-cols-6">
+          {/* Brand column */}
+          <div className="lg:col-span-2">
             <Link href="/" className="flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-purple-600">
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 shadow-lg shadow-blue-500/25">
                 <span className="text-sm font-bold text-white">N</span>
               </div>
-              <span className="text-lg font-bold text-white">{SITE_CONFIG.name}</span>
+              <span className="text-xl font-bold text-white">
+                {SITE_CONFIG.name}
+              </span>
             </Link>
-            <p className="mt-4 max-w-xs text-sm text-gray-400">
+            <p className="mt-4 max-w-xs text-sm text-gray-400 leading-relaxed">
               {SITE_CONFIG.description}
             </p>
-          </div>
 
-          <div>
-            <h3 className="text-sm font-semibold text-white">Links</h3>
-            <ul className="mt-4 space-y-2">
-              {NAV_ITEMS.map((item) => (
-                <li key={item.href}>
-                  <Link
-                    href={item.href}
-                    className="text-sm text-gray-400 transition-colors hover:text-white"
-                  >
-                    {item.label}
-                  </Link>
-                </li>
+            {/* Social links */}
+            <div className="mt-6 flex gap-3">
+              {socialLinks.map((social) => (
+                <a
+                  key={social.label}
+                  href={social.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={social.label}
+                  className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/5 text-gray-400 transition-all duration-300 hover:bg-white/10 hover:text-white"
+                >
+                  <social.icon className="h-4 w-4" />
+                </a>
               ))}
-            </ul>
-          </div>
-
-          <div>
-            <h3 className="text-sm font-semibold text-white">Social</h3>
-            <div className="mt-4 flex gap-4">
-              <a
-                href="https://github.com/Dgabriel-dev"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="GitHub"
-                className="text-gray-400 transition-colors hover:text-white"
-              >
-                <GithubIcon className="h-5 w-5" />
-              </a>
-              <a
-                href="#"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="LinkedIn"
-                className="text-gray-400 transition-colors hover:text-white"
-              >
-                <LinkedinIcon className="h-5 w-5" />
-              </a>
-              <a
-                href="#"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Twitter"
-                className="text-gray-400 transition-colors hover:text-white"
-              >
-                <TwitterIcon className="h-5 w-5" />
-              </a>
             </div>
           </div>
+
+          {/* Link columns */}
+          {FOOTER_LINKS.map((group) => (
+            <div key={group.title}>
+              <h3 className="text-sm font-semibold text-white">{group.title}</h3>
+              <ul className="mt-4 space-y-3">
+                {group.links.map((link) => (
+                  <li key={link.label}>
+                    <Link
+                      href={link.href}
+                      className="text-sm text-gray-400 transition-colors duration-200 hover:text-white"
+                    >
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
         </div>
 
-        <div className="mt-12 border-t border-white/10 pt-8 text-center text-sm text-gray-500">
-          <p>&copy; {new Date().getFullYear()} {SITE_CONFIG.name}. Todos os direitos reservados.</p>
+        {/* Newsletter */}
+        <FadeIn delay={0.2}>
+          <div className="mt-12 flex flex-col items-start gap-6 rounded-2xl border border-white/10 bg-white/[0.02] p-6 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h3 className="text-sm font-semibold text-white">
+                Receba novidades
+              </h3>
+              <p className="mt-1 text-sm text-gray-400">
+                Updates sobre IA, product tips e lançamentos.
+              </p>
+            </div>
+            <form className="flex w-full gap-2 sm:w-auto" onSubmit={(e) => e.preventDefault()}>
+              <input
+                type="email"
+                placeholder="seu@email.com"
+                aria-label="Email para newsletter"
+                className="flex-1 rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-gray-500 outline-none transition-colors focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/50 sm:w-64"
+              />
+              <button
+                type="submit"
+                className="shrink-0 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 px-5 py-2.5 text-sm font-semibold text-white transition-all hover:from-blue-700 hover:to-purple-700"
+              >
+                Inscrever
+              </button>
+            </form>
+          </div>
+        </FadeIn>
+
+        {/* Bottom bar */}
+        <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-white/10 pt-8 sm:flex-row">
+          <p className="text-xs text-gray-500">
+            &copy; {new Date().getFullYear()} {SITE_CONFIG.name}. Todos os
+            direitos reservados.
+          </p>
+          <div className="flex gap-6">
+            <Link
+              href="#"
+              className="text-xs text-gray-500 transition-colors hover:text-gray-400"
+            >
+              Privacidade
+            </Link>
+            <Link
+              href="#"
+              className="text-xs text-gray-500 transition-colors hover:text-gray-400"
+            >
+              Termos
+            </Link>
+            <Link
+              href="#"
+              className="text-xs text-gray-500 transition-colors hover:text-gray-400"
+            >
+              Cookies
+            </Link>
+          </div>
         </div>
       </div>
     </footer>

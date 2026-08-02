@@ -1,18 +1,22 @@
 import Hero from "@/components/sections/Hero";
-import About from "@/components/sections/About";
+import Partners from "@/components/sections/Partners";
+import Benefits from "@/components/sections/Benefits";
 import Features from "@/components/sections/Features";
 import HowItWorks from "@/components/sections/HowItWorks";
 import Testimonials from "@/components/sections/Testimonials";
+import FAQ from "@/components/sections/FAQ";
 import CTA from "@/components/sections/CTA";
 
 export default function Home() {
   return (
     <>
       <Hero />
-      <About />
+      <Partners />
+      <Benefits />
       <Features />
       <HowItWorks />
       <Testimonials />
+      <FAQ />
       <CTA />
     </>
   );
