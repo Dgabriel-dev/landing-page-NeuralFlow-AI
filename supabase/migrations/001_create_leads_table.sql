@@ -13,25 +13,39 @@ CREATE TABLE IF NOT EXISTS leads (
   status TEXT DEFAULT 'new' CHECK (status IN ('new', 'contacted', 'converted', 'archived'))
 );
 
--- Índice para buscas por email (deduplicação)
+-- Índices
 CREATE UNIQUE INDEX IF NOT EXISTS idx_leads_email ON leads (email);
-
--- Índice para ordenação por data
 CREATE INDEX IF NOT EXISTS idx_leads_created_at ON leads (created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_leads_status ON leads (status);
 
+-- =============================================
 -- RLS (Row Level Security)
+-- =============================================
 ALTER TABLE leads ENABLE ROW LEVEL SECURITY;
 
--- Política: apenas service_role pode inserir (via API route ou edge function)
--- O client anon NÃO deve ter acesso direto à tabela por segurança
-CREATE POLICY "Insert only via service role" ON leads
+-- Público pode inserir (formulário de contato)
+CREATE POLICY "Allow public insert" ON leads
   FOR INSERT
   WITH CHECK (true);
 
--- Política: sem select/update/delete para o anon key
-CREATE POLICY "No read for anon" ON leads
+-- Usuários autenticados podem ler todos os leads (admin)
+CREATE POLICY "Allow authenticated read" ON leads
   FOR SELECT
-  USING (false);
+  TO authenticated
+  USING (true);
+
+-- Usuários autenticados podem deletar leads (admin)
+CREATE POLICY "Allow authenticated delete" ON leads
+  FOR DELETE
+  TO authenticated
+  USING (true);
+
+-- Usuários autenticados podem atualizar status dos leads
+CREATE POLICY "Allow authenticated update" ON leads
+  FOR UPDATE
+  TO authenticated
+  USING (true)
+  WITH CHECK (true);
 
 -- =============================================
 -- COMENTÁRIOS
