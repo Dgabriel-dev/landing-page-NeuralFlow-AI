@@ -43,7 +43,6 @@ export default function ContactForm() {
       };
       const { error } = await getSupabase()
         .from("leads")
-        // @ts-expect-error Supabase types don't match our schema
         .insert(insertPayload);
 
       if (error) {
