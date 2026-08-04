@@ -10,68 +10,35 @@ export default function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const [user, setUser] = useState<{ email?: string } | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const router = useRouter();
   const pathname = usePathname();
-
+  const router = useRouter();
+  const [ready, setReady] = useState(false);
   const isLoginPage = pathname === "/admin/login";
 
   useEffect(() => {
     if (isLoginPage) {
-      setLoading(false);
+      setReady(true);
       return;
     }
 
-    let cancelled = false;
-
-    const timeout = setTimeout(() => {
-      if (!cancelled) {
-        setError("Tempo esgotado ao conectar com Supabase.");
-        setLoading(false);
-      }
-    }, 10000);
-
-    async function checkAuth() {
-      try {
-        if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-          if (!cancelled) {
-            setError("Variáveis de ambiente do Supabase não configuradas.");
-            setLoading(false);
-          }
-          return;
-        }
-
-        const { getSupabase } = await import("@/lib/supabase");
-        const supabase = getSupabase();
-        const { data, error: sessionError } = await supabase.auth.getSession();
-
-        if (cancelled) return;
-
-        if (sessionError || !data.session) {
-          router.replace("/admin/login");
-          return;
-        }
-
-        setUser(data.session.user);
-        setLoading(false);
-      } catch {
-        if (!cancelled) {
-          router.replace("/admin/login");
-        }
+    async function check() {
+      const { getSupabase } = await import("@/lib/supabase");
+      const { data } = await getSupabase().auth.getSession();
+      if (!data.session) {
+        router.replace("/admin/login");
+      } else {
+        setReady(true);
       }
     }
 
-    checkAuth();
+    check();
+  }, [isLoginPage, router]);
 
-    return () => {
-      cancelled = true;
-      clearTimeout(timeout);
-    };
-  }, [router, isLoginPage]);
+  if (isLoginPage) {
+    return <>{children}</>;
+  }
 
-  if (loading) {
+  if (!ready) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-gray-950">
         <Loader2 className="h-8 w-8 animate-spin text-blue-400" />
@@ -79,26 +46,9 @@ export default function AdminLayout({
     );
   }
 
-  if (isLoginPage) {
-    return <>{children}</>;
-  }
-
-  if (error) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-950 px-4">
-        <div className="max-w-md rounded-2xl border border-red-500/20 bg-red-500/10 p-8 text-center">
-          <h2 className="text-lg font-semibold text-red-400">Erro de Configuração</h2>
-          <p className="mt-2 text-sm text-gray-400">{error}</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!user) return null;
-
   return (
     <div className="flex min-h-screen bg-gray-950">
-      <AdminSidebar user={user} />
+      <AdminSidebar />
       <main className="flex-1 overflow-auto p-6 lg:p-8">
         {children}
       </main>

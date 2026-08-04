@@ -6,29 +6,26 @@ import { getSupabase } from "@/lib/supabase";
 import Link from "next/link";
 import {
   LayoutDashboard,
-  Users,
   LogOut,
-  BarChart3,
-  Settings,
   X,
   Menu,
 } from "lucide-react";
 
 const navItems = [
   { label: "Dashboard", href: "/admin", icon: LayoutDashboard },
-  { label: "Leads", href: "/admin/leads", icon: Users },
-  { label: "Analytics", href: "/admin/analytics", icon: BarChart3 },
-  { label: "Configurações", href: "/admin/settings", icon: Settings },
 ];
 
-export default function AdminSidebar({
-  user,
-}: {
-  user: { email?: string };
-}) {
+export default function AdminSidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [userEmail, setUserEmail] = useState("");
+
+  useEffect(() => {
+    getSupabase().auth.getSession().then(({ data }) => {
+      setUserEmail(data.session?.user?.email ?? "");
+    });
+  }, []);
 
   const handleLogout = useCallback(async () => {
     await getSupabase().auth.signOut();
@@ -84,7 +81,7 @@ export default function AdminSidebar({
 
       <div className="border-t border-white/10 p-4">
         <div className="mb-3 truncate rounded-lg bg-white/5 px-3 py-2 text-xs text-gray-400">
-          {user.email}
+          {userEmail}
         </div>
         <button
           onClick={handleLogout}

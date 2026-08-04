@@ -41,7 +41,7 @@ export default function ContactForm() {
         company: data.company || null,
         message: data.message,
       };
-      const { error } = await getSupabase()
+      const { error } = await (getSupabase() as any)
         .from("leads")
         .insert(insertPayload);
 
