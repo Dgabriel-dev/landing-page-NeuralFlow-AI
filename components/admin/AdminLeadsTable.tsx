@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { getSupabase } from "@/lib/supabase";
+import { STATUS_LABELS } from "@/lib/status-labels";
 import type { Lead } from "@/types";
 import {
   Search,
@@ -13,20 +14,12 @@ import {
   Mail,
   Building2,
   Calendar,
-  MessageSquare,
   Download,
   Eye,
   CheckSquare,
   Square,
   X,
 } from "lucide-react";
-
-const statusLabels: Record<string, { label: string; color: string }> = {
-  new: { label: "Novo", color: "bg-blue-500/10 text-blue-400 border-blue-500/20" },
-  contacted: { label: "Contactado", color: "bg-yellow-500/10 text-yellow-400 border-yellow-500/20" },
-  converted: { label: "Convertido", color: "bg-green-500/10 text-green-400 border-green-500/20" },
-  archived: { label: "Arquivado", color: "bg-gray-500/10 text-gray-400 border-gray-500/20" },
-};
 
 function exportToCSV(leads: Lead[]) {
   const headers = ["Nome", "Email", "Empresa", "Mensagem", "Status", "Data"];
@@ -35,7 +28,7 @@ function exportToCSV(leads: Lead[]) {
     l.email,
     l.company || "",
     l.message,
-    statusLabels[l.status]?.label || l.status,
+    STATUS_LABELS[l.status]?.label || l.status,
     new Date(l.created_at).toLocaleDateString("pt-BR"),
   ]);
 
@@ -73,7 +66,6 @@ export default function AdminLeadsTable({
   onRefresh: () => void;
 }) {
   const [deletingId, setDeletingId] = useState<string | null>(null);
-  const [expandedId, setExpandedId] = useState<string | null>(null);
   const [searchInput, setSearchInput] = useState(search);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [bulkDeleting, setBulkDeleting] = useState(false);
@@ -337,7 +329,7 @@ export default function AdminLeadsTable({
                           <select
                             value={lead.status}
                             onChange={(e) => handleStatusChange(lead.id, e.target.value)}
-                            className={`appearance-none rounded-full border px-2.5 py-0.5 text-xs font-medium outline-none cursor-pointer ${statusLabels[lead.status]?.color || ""}`}
+                            className={`appearance-none rounded-full border px-2.5 py-0.5 text-xs font-medium outline-none cursor-pointer ${STATUS_LABELS[lead.status]?.color || ""}`}
                           >
                             <option value="new">Novo</option>
                             <option value="contacted">Contactado</option>
@@ -357,13 +349,6 @@ export default function AdminLeadsTable({
                           <Eye className="h-4 w-4" />
                         </button>
                         <button
-                          onClick={() => setExpandedId(expandedId === lead.id ? null : lead.id)}
-                          className="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-white/10 hover:text-white"
-                          aria-label={expandedId === lead.id ? "Ocultar mensagem" : "Ver mensagem"}
-                        >
-                          <MessageSquare className="h-4 w-4" />
-                        </button>
-                        <button
                           onClick={() => handleDelete(lead.id)}
                           disabled={deletingId === lead.id}
                           className="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-red-500/10 hover:text-red-400 disabled:opacity-50"
@@ -381,15 +366,6 @@ export default function AdminLeadsTable({
                 ))}
               </tbody>
             </table>
-          )}
-
-          {expandedId && (
-            <div className="border-t border-white/10 bg-white/[0.02] px-4 py-4">
-              <div className="text-xs text-gray-500">Mensagem:</div>
-              <p className="mt-1 text-sm text-gray-300">
-                {leads.find((l) => l.id === expandedId)?.message}
-              </p>
-            </div>
           )}
         </div>
 
@@ -473,8 +449,8 @@ export default function AdminLeadsTable({
               </div>
               <div className="flex justify-between border-b border-white/10 pb-2">
                 <span className="text-gray-500">Status</span>
-                <span className={`rounded-full border px-2.5 py-0.5 text-xs font-medium ${statusLabels[detailLead.status]?.color || ""}`}>
-                  {statusLabels[detailLead.status]?.label || detailLead.status}
+                <span className={`rounded-full border px-2.5 py-0.5 text-xs font-medium ${STATUS_LABELS[detailLead.status]?.color || ""}`}>
+                  {STATUS_LABELS[detailLead.status]?.label || detailLead.status}
                 </span>
               </div>
               <div className="flex justify-between border-b border-white/10 pb-2">

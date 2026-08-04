@@ -3,14 +3,12 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getSupabase } from "@/lib/supabase";
-import { Loader2, Save, LogOut, User } from "lucide-react";
+import { Loader2, LogOut, User } from "lucide-react";
 
 export default function SettingsPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [message, setMessage] = useState("");
 
   useEffect(() => {
     getSupabase().auth.getSession().then(({ data }) => {
@@ -65,12 +63,6 @@ export default function SettingsPage() {
             </div>
           </div>
         </div>
-
-        {message && (
-          <div className="rounded-xl border border-green-500/20 bg-green-500/10 px-4 py-3 text-sm text-green-400">
-            {message}
-          </div>
-        )}
 
         <div className="rounded-xl border border-white/10 bg-white/[0.02] p-6">
           <h2 className="mb-4 text-lg font-semibold text-white">Conta</h2>

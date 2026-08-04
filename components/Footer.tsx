@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { SITE_CONFIG, FOOTER_LINKS } from "@/lib/constants";
 import FadeIn from "@/ui/FadeIn";
+import Logo from "@/ui/Logo";
 
 function GithubIcon({ className }: { className?: string }) {
   return (
@@ -43,9 +44,7 @@ export default function Footer() {
           {/* Brand column */}
           <div className="lg:col-span-2">
             <Link href="/" className="flex items-center gap-2">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 shadow-lg shadow-blue-500/25">
-                <span className="text-sm font-bold text-white">N</span>
-              </div>
+              <Logo size="sm" />
               <span className="text-xl font-bold text-white">
                 {SITE_CONFIG.name}
               </span>

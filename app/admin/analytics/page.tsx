@@ -22,7 +22,6 @@ interface AnalyticsData {
   convertedLeads: number;
   archivedLeads: number;
   recentLeads: { name: string; email: string; created_at: string; status: string }[];
-  leadsByDay: { date: string; count: number }[];
   conversionRate: number;
 }
 
@@ -72,7 +71,6 @@ export default function AnalyticsPage() {
             convertedLeads: convertedCount,
             archivedLeads: archived.count || 0,
             recentLeads: recent.data || [],
-            leadsByDay: [],
             conversionRate: totalCount > 0 ? Math.round((convertedCount / totalCount) * 100) : 0,
           });
         }

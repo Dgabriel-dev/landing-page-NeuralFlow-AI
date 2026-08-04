@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { getSupabase } from "@/lib/supabase";
 import { Eye, EyeOff, Loader2, AlertCircle } from "lucide-react";
+import Logo from "@/ui/Logo";
 
 export default function AdminLoginPage() {
   const [email, setEmail] = useState("");
@@ -55,8 +56,8 @@ export default function AdminLoginPage() {
 
       <div className="relative z-10 w-full max-w-md">
         <div className="mb-8 text-center">
-          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 shadow-xl shadow-blue-500/25">
-            <span className="text-xl font-bold text-white">N</span>
+          <div className="mx-auto mb-4">
+            <Logo size="md" />
           </div>
           <h1 className="text-2xl font-bold text-white">NeuralFlow Admin</h1>
           <p className="mt-2 text-sm text-gray-400">

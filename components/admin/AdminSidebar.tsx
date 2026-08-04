@@ -4,6 +4,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useState, useCallback } from "react";
 import { getSupabase } from "@/lib/supabase";
 import Link from "next/link";
+import Logo from "@/ui/Logo";
 import {
   LayoutDashboard,
   Users,
@@ -52,9 +53,7 @@ export default function AdminSidebar() {
   const sidebar = (
     <div className="flex h-full flex-col">
       <div className="flex items-center gap-3 border-b border-white/10 px-6 py-5">
-        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-purple-600">
-          <span className="text-sm font-bold text-white">N</span>
-        </div>
+        <Logo size="sm" />
         <div>
           <div className="text-sm font-semibold text-white">NeuralFlow</div>
           <div className="text-xs text-gray-500">Admin Panel</div>

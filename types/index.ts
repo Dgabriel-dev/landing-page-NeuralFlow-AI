@@ -68,8 +68,3 @@ export interface ButtonProps {
   className?: string;
   type?: "button" | "submit" | "reset";
 }
-
-export interface ThemeContextType {
-  theme: "light" | "dark";
-  toggleTheme: () => void;
-}
