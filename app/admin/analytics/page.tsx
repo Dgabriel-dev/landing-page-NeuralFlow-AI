@@ -2,6 +2,18 @@
 
 import { useEffect, useState } from "react";
 import { Loader2, TrendingUp, TrendingDown, Users, Mail, Building2, Clock } from "lucide-react";
+import {
+  PieChart,
+  Pie,
+  Cell,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
 
 interface AnalyticsData {
   totalLeads: number;
@@ -13,6 +25,20 @@ interface AnalyticsData {
   leadsByDay: { date: string; count: number }[];
   conversionRate: number;
 }
+
+const COLORS = {
+  new: "#3b82f6",
+  contacted: "#eab308",
+  converted: "#22c55e",
+  archived: "#6b7280",
+};
+
+const statusNames: Record<string, string> = {
+  new: "Novos",
+  contacted: "Contactados",
+  converted: "Convertidos",
+  archived: "Arquivados",
+};
 
 export default function AnalyticsPage() {
   const [data, setData] = useState<AnalyticsData | null>(null);
@@ -71,6 +97,20 @@ export default function AnalyticsPage() {
 
   if (!data) return null;
 
+  const pieData = [
+    { name: "Novos", value: data.newLeads, color: COLORS.new },
+    { name: "Contactados", value: data.contactedLeads, color: COLORS.contacted },
+    { name: "Convertidos", value: data.convertedLeads, color: COLORS.converted },
+    { name: "Arquivados", value: data.archivedLeads, color: COLORS.archived },
+  ].filter((d) => d.value > 0);
+
+  const barData = [
+    { name: "Novos", value: data.newLeads, fill: COLORS.new },
+    { name: "Contactados", value: data.contactedLeads, fill: COLORS.contacted },
+    { name: "Convertidos", value: data.convertedLeads, fill: COLORS.converted },
+    { name: "Arquivados", value: data.archivedLeads, fill: COLORS.archived },
+  ];
+
   const statCards = [
     { label: "Total de Leads", value: data.totalLeads, icon: Users, color: "text-white" },
     { label: "Novos", value: data.newLeads, icon: Mail, color: "text-blue-400" },
@@ -106,6 +146,82 @@ export default function AnalyticsPage() {
         ))}
       </div>
 
+      <div className="mb-8 grid gap-6 lg:grid-cols-2">
+        <div className="rounded-xl border border-white/10 bg-white/[0.02] p-6">
+          <h2 className="mb-4 text-lg font-semibold text-white">Distribuição por Status</h2>
+          {pieData.length === 0 ? (
+            <p className="text-sm text-gray-500">Sem dados para exibir.</p>
+          ) : (
+            <div className="flex items-center justify-center">
+              <ResponsiveContainer width="100%" height={280}>
+                <PieChart>
+                  <Pie
+                    data={pieData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={60}
+                    outerRadius={100}
+                    paddingAngle={4}
+                    dataKey="value"
+                    stroke="none"
+                  >
+                    {pieData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "#1f2937",
+                      border: "1px solid rgba(255,255,255,0.1)",
+                      borderRadius: "8px",
+                      color: "#fff",
+                    }}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          )}
+          {pieData.length > 0 && (
+            <div className="mt-4 flex flex-wrap justify-center gap-4">
+              {pieData.map((d) => (
+                <div key={d.name} className="flex items-center gap-2 text-xs text-gray-400">
+                  <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: d.color }} />
+                  {d.name}: {d.value}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className="rounded-xl border border-white/10 bg-white/[0.02] p-6">
+          <h2 className="mb-4 text-lg font-semibold text-white">Leads por Status</h2>
+          {data.totalLeads === 0 ? (
+            <p className="text-sm text-gray-500">Sem dados para exibir.</p>
+          ) : (
+            <ResponsiveContainer width="100%" height={280}>
+              <BarChart data={barData} barSize={40}>
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+                <XAxis dataKey="name" tick={{ fill: "#9ca3af", fontSize: 12 }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fill: "#9ca3af", fontSize: 12 }} axisLine={false} tickLine={false} allowDecimals={false} />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: "#1f2937",
+                    border: "1px solid rgba(255,255,255,0.1)",
+                    borderRadius: "8px",
+                    color: "#fff",
+                  }}
+                />
+                <Bar dataKey="value" radius={[6, 6, 0, 0]}>
+                  {barData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.fill} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          )}
+        </div>
+      </div>
+
       <div className="rounded-xl border border-white/10 bg-white/[0.02] p-6">
         <h2 className="mb-4 text-lg font-semibold text-white">Leads Recentes</h2>
         {data.recentLeads.length === 0 ? (
@@ -132,9 +248,7 @@ export default function AnalyticsPage() {
                     lead.status === "converted" ? "border-green-500/20 bg-green-500/10 text-green-400" :
                     "border-gray-500/20 bg-gray-500/10 text-gray-400"
                   }`}>
-                    {lead.status === "new" ? "Novo" :
-                     lead.status === "contacted" ? "Contactado" :
-                     lead.status === "converted" ? "Convertido" : "Arquivado"}
+                    {statusNames[lead.status] || lead.status}
                   </span>
                 </div>
               </div>

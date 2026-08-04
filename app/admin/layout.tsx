@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import AdminSidebar from "@/components/admin/AdminSidebar";
+import RealTimeNotifications from "@/components/admin/RealTimeNotifications";
 import { Loader2 } from "lucide-react";
 
 export default function AdminLayout({
@@ -50,6 +51,9 @@ export default function AdminLayout({
     <div className="flex min-h-screen bg-gray-950">
       <AdminSidebar />
       <main className="flex-1 overflow-auto p-6 lg:p-8">
+        <div className="mb-4 flex justify-end">
+          <RealTimeNotifications />
+        </div>
         {children}
       </main>
     </div>
