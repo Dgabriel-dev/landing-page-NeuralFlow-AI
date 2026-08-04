@@ -55,17 +55,17 @@ export default function AdminLoginPage() {
       </div>
 
       <div className="relative z-10 w-full max-w-md">
-        <div className="mb-8 text-center">
-          <div className="mx-auto mb-4">
-            <Logo size="md" />
-          </div>
-          <h1 className="text-2xl font-bold text-white">NeuralFlow Admin</h1>
-          <p className="mt-2 text-sm text-gray-400">
-            Acesse o painel administrativo
-          </p>
-        </div>
-
         <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-8 backdrop-blur-sm">
+          <div className="mb-6 flex flex-col items-center gap-3">
+            <Logo size="sm" />
+            <div className="text-center">
+              <h1 className="text-xl font-bold text-white">NeuralFlow Admin</h1>
+              <p className="mt-1 text-sm text-gray-400">
+                Acesse o painel administrativo
+              </p>
+            </div>
+          </div>
+
           <form onSubmit={handleLogin} className="space-y-5" noValidate>
             {error && (
               <div role="alert" className="flex items-center gap-2 rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-400">
