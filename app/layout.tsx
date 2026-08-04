@@ -5,6 +5,7 @@ import ToastProvider from "@/components/ToastProvider";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { SITE_CONFIG } from "@/lib/constants";
+import AdminLayoutWrapper from "@/components/admin/AdminLayoutWrapper";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -128,11 +129,9 @@ export default function RootLayout({
           Pular para o conteúdo
         </a>
         <ToastProvider>
-          <Navbar />
-          <main id="main-content" className="flex-1">
+          <AdminLayoutWrapper>
             {children}
-          </main>
-          <Footer />
+          </AdminLayoutWrapper>
         </ToastProvider>
       </body>
     </html>
