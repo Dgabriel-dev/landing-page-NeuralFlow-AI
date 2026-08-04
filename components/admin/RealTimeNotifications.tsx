@@ -76,33 +76,39 @@ export default function RealTimeNotifications() {
         )}
       </button>
 
-      {isOpen && notifications.length > 0 && (
+      {isOpen && (
         <div className="absolute right-0 top-full z-50 mt-2 w-80 rounded-xl border border-white/10 bg-gray-900 shadow-2xl">
           <div className="border-b border-white/10 px-4 py-3">
             <h3 className="text-sm font-semibold text-white">Novos Leads</h3>
           </div>
-          <div className="max-h-64 overflow-y-auto">
-            {notifications.map((n) => (
-              <div
-                key={n.id}
-                className="flex items-start gap-3 border-b border-white/5 px-4 py-3 last:border-0"
-              >
-                <div className="flex-1">
-                  <div className="text-sm font-medium text-white">{n.name}</div>
-                  <div className="text-xs text-gray-500">{n.email}</div>
-                  <div className="mt-1 text-[10px] text-gray-600">
-                    {new Date(n.created_at).toLocaleTimeString("pt-BR")}
-                  </div>
-                </div>
-                <button
-                  onClick={() => removeNotification(n.id)}
-                  className="text-gray-500 hover:text-white"
+          {notifications.length === 0 ? (
+            <div className="px-4 py-6 text-center text-sm text-gray-500">
+              Nenhuma notificação nova.
+            </div>
+          ) : (
+            <div className="max-h-64 overflow-y-auto">
+              {notifications.map((n) => (
+                <div
+                  key={n.id}
+                  className="flex items-start gap-3 border-b border-white/5 px-4 py-3 last:border-0"
                 >
-                  <X className="h-3 w-3" />
-                </button>
-              </div>
-            ))}
-          </div>
+                  <div className="flex-1">
+                    <div className="text-sm font-medium text-white">{n.name}</div>
+                    <div className="text-xs text-gray-500">{n.email}</div>
+                    <div className="mt-1 text-[10px] text-gray-600">
+                      {new Date(n.created_at).toLocaleTimeString("pt-BR")}
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => removeNotification(n.id)}
+                    className="text-gray-500 hover:text-white"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>
