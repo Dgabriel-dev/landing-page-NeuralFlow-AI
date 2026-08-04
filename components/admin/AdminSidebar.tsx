@@ -6,13 +6,19 @@ import { getSupabase } from "@/lib/supabase";
 import Link from "next/link";
 import {
   LayoutDashboard,
+  Users,
   LogOut,
+  BarChart3,
+  Settings,
   X,
   Menu,
 } from "lucide-react";
 
 const navItems = [
   { label: "Dashboard", href: "/admin", icon: LayoutDashboard },
+  { label: "Leads", href: "/admin/leads", icon: Users },
+  { label: "Analytics", href: "/admin/analytics", icon: BarChart3 },
+  { label: "Configurações", href: "/admin/settings", icon: Settings },
 ];
 
 export default function AdminSidebar() {
