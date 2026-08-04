@@ -18,6 +18,26 @@ O projeto consiste em:
 
 ---
 
+## Rodando Localmente (sem Supabase/Vercel)
+
+Se você quer rodar o projeto **100% local** sem criar conta no Supabase, veja o guia:
+
+**[SETUP_LOCAL.md](./SETUP_LOCAL.md)** — instruções completas para rodar com Docker + PostgreSQL local.
+
+Resumo rápido:
+
+```bash
+npm install
+docker compose -f docker-compose.local.yml up -d
+node scripts/db-setup-local.js
+cp .env.local.example.local .env.local
+npm run dev
+```
+
+Login: `admin@neuralflow.ai` / `admin123`
+
+---
+
 ## Stack Tecnológica
 
 | Camada | Tecnologia |
@@ -285,7 +305,12 @@ npm run start
 ├── supabase/
 │   └── migrations/
 │       └── 001_create_leads_table.sql
-├── .env.local.example          # Exemplo de variáveis de ambiente
+├── docker-compose.local.yml      # PostgreSQL local via Docker
+├── scripts/
+│   └── db-setup-local.js         # Setup do banco local
+├── SETUP_LOCAL.md                # Guia de instalação local
+├── .env.local.example            # Variáveis de ambiente (Supabase)
+├── .env.local.example.local      # Variáveis de ambiente (local)
 └── package.json
 ```
 
